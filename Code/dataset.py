@@ -30,7 +30,6 @@ def dataset(name = "german"):
     qtd_neuron_per_hidden_layer = 50
     n_classes = 2
     aux_layer = 3
-    n_aux_feat = 22
     n_neuron_aux_layer = 100
     batch_size = 1
     b = 0.99
@@ -48,6 +47,7 @@ def dataset(name = "german"):
         # Path to data
         data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'german.data-numeric')
         n_feat = 24
+        n_aux_feat = 22
         number_of_instances = 1000
 
         # reading csv files
@@ -73,3 +73,40 @@ def dataset(name = "german"):
         return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
                 n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
                 dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+    
+    if name == "svmguide3":
+        # Data description
+        # Path to data
+        data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'svmguide3.txt')
+        n_feat = 21
+        n_aux_feat = 19
+        number_of_instances = 1243
+
+        # reading csv files
+        # data_initial =  arff.loadarff(data_path)
+        data_initial =  pd.read_csv(data_path, sep=" ", header=None)
+        data_initial = data_initial.iloc[:, :22]
+        for j in range(1, data_initial.shape[1]):
+                for i in range(data_initial.shape[0]):
+                        data_initial.iloc[i, j] = data_initial.iloc[i, j].split(":")[1]
+        for i in range(data_initial.shape[0]):
+                data_initial.iloc[i, 0] = (data_initial.iloc[i, 0] == -1)*1
+        data = data_initial.sample(frac = 1)
+        label = np.asarray(data[0])
+
+        # Masking
+        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+
+        # Data division
+        n_base_feat = data.shape[1] - 1 - n_aux_feat
+        Y = np.array(data.iloc[:,:1])
+        X_base = np.array(data.iloc[:,1:n_base_feat+1], dtype = float)
+        X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
+        X_aux_new = np.where(aux_mask, X_aux, 0)
+        
+        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
+                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
+                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+
+    else:
+        print("The data name entered is wrong. Please type one of the following names: german, svmguide3, magic04, a8a")
