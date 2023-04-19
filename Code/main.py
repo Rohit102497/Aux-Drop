@@ -14,10 +14,10 @@ from dataset import dataset
 
 
 # Data description
-# "german", "svmguide3"
-data_name = "svmguide3"
+# "german", "svmguide3", "magic04"
+data_name = "magic04"
 
-# Please change the value of hyperparameters in the dataset.py file
+# Please change the value of hyperparameters in the dataset.py file corresponding to the chose data name
 n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label = dataset(data_name)
 
 # Creating the Aux-Drop Model

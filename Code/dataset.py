@@ -107,6 +107,37 @@ def dataset(name = "german"):
         return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
                 n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
                 dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+    
+    if name == "magic04":
+        # Data description
+        # Path to data
+        data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'magic04.data')
+        n_feat = 10
+        n_aux_feat = 8
+        number_of_instances = 19020
+
+        # reading csv files
+        data_initial =  pd.read_csv(data_path, sep=",", header=None)
+        data_shuffled = data_initial.sample(frac = 1)
+        label = np.array(data_shuffled[n_feat] == "g")*1
+        data = data_shuffled.iloc[: , :n_feat]
+        data.insert(0, column='class', value=label)
+
+
+        # Masking
+        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+
+        # Data division
+        n_base_feat = data.shape[1] - 1 - n_aux_feat
+        Y = np.array(data.iloc[:,:1])
+        X_base = np.array(data.iloc[:,1:n_base_feat+1])
+        X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
+        X_aux_new = np.where(aux_mask, X_aux, 0)
+
+        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
+                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
+                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+        
 
     else:
         print("The data name entered is wrong. Please type one of the following names: german, svmguide3, magic04, a8a")
