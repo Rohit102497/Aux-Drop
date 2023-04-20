@@ -4,7 +4,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.parameter import Parameter
+import torch.optim as optim
 
+# code for Aux-Drop(ODL)
 class AuxDrop_ODL(nn.Module):
     def __init__(self, features_size, max_num_hidden_layers, qtd_neuron_per_hidden_layer, n_classes, aux_layer, 
                  n_neuron_aux_layer, batch_size=1, b=0.99, n=0.01, s=0.2, dropout_p=0.5, n_aux_feat = 3, use_cuda=False):
@@ -247,3 +249,109 @@ class AuxDrop_ODL(nn.Module):
         self.validate_input_X(aux_data)
         self.validate_input_Y(Y_data)
         self.update_weights(X_data, aux_data, aux_mask, Y_data, show_loss)
+
+
+# Aux-Drop (OGD) code
+class AuxDrop_OGD(nn.Module):
+    def __init__(self, features_size, max_num_hidden_layers = 5, qtd_neuron_per_hidden_layer = 100, n_classes = 2, aux_layer = 3, 
+                 n_neuron_aux_layer = 100, batch_size=1, n_aux_feat = 3, n=0.01, dropout_p=0.5):
+        super(AuxDrop_OGD, self).__init__()
+
+        self.features_size = features_size 
+        self.max_layers = max_num_hidden_layers
+        self.qtd_neuron_per_hidden_layer = qtd_neuron_per_hidden_layer
+        self.aux_layer = aux_layer 
+        self.n_neuron_aux_layer = n_neuron_aux_layer
+        self.n_aux_feat = n_aux_feat
+        self.n_classes = n_classes
+        self.p = dropout_p
+        self.batch_size = batch_size
+        self.n = n
+
+        # Stores hidden layers
+        self.hidden_layers = []
+
+        self.hidden_layers.append(
+            nn.Linear(self.features_size, self.qtd_neuron_per_hidden_layer, bias=True))
+        for i in range(self.max_layers - 1):
+            # The input to the aux_layer is the outpout coming from its previous layer, i.e., "qtd_neuron_per_hidden_layer" and the 
+            # number of auxiliary features, "n_aux_feat".
+            if i+2 == self.aux_layer:
+                self.hidden_layers.append(
+                    nn.Linear(self.n_aux_feat + self.qtd_neuron_per_hidden_layer, self.n_neuron_aux_layer, bias=True))
+            elif i + 1 == self.aux_layer:
+                self.hidden_layers.append(
+                    nn.Linear(self.n_neuron_aux_layer, self.qtd_neuron_per_hidden_layer, bias=True))
+            else:
+                self.hidden_layers.append(
+                    nn.Linear(qtd_neuron_per_hidden_layer, qtd_neuron_per_hidden_layer, bias=True))
+        self.hidden_layers = nn.ModuleList(self.hidden_layers)
+
+        self.output_layer = nn.Linear(self.qtd_neuron_per_hidden_layer, 
+            self.n_classes, bias=True)
+
+        self.loss_fn = nn.CrossEntropyLoss()
+        
+        self.prediction = []
+        self.loss_array = []
+    
+    def forward(self, X, aux_feat, aux_mask):
+
+        X = torch.from_numpy(X).float()
+        aux_feat = torch.from_numpy(aux_feat).float()
+        aux_mask = torch.from_numpy(aux_mask).float()
+
+        # Forward pass of the first hidden layer. Apply the linear transformation and then relu. The output from the relu is the input
+        # passed to the next layer.
+        inp = F.relu(self.hidden_layers[0](X))
+
+        for i in range(1, self.max_layers):
+            # Forward pass to the Aux layer.
+            if i==self.aux_layer-1:
+                # Input to the aux layer will be the output from its previous layer and the incoming auxiliary inputs.
+                inp = F.relu(self.hidden_layers[i](torch.cat((aux_feat, inp), dim=1)))
+                # Based on the incoming aux data, the aux inputs which do not come gets included in the dropout probability.
+                # Based on that we calculate the probability to drop the left over neurons in auxiliary layer.
+                
+                aux_p = (self.p * self.n_neuron_aux_layer - (aux_mask.size()[1] - torch.sum(aux_mask)))/(self.n_neuron_aux_layer 
+                            - aux_mask.size()[1])
+                binomial = torch.distributions.binomial.Binomial(probs=1-aux_p)
+                non_aux_mask = binomial.sample([1, self.n_neuron_aux_layer - aux_mask.size()[1]])
+                mask = torch.cat((aux_mask, non_aux_mask), dim = 1)
+                inp = inp*mask*(1.0/(1-self.p))
+            else:
+                inp = F.relu(self.hidden_layers[i](inp))
+        
+        out = F.softmax(self.output_layer(inp), dim=1)
+
+        return out
+
+    def validate_input_X(self, data):
+        if len(data.shape) != 2:
+            raise Exception(
+                "Wrong dimension for this X data. It should have only two dimensions.")
+    
+    def validate_input_Y(self, data):
+        if len(data.shape) != 1:
+            raise Exception(
+                "Wrong dimension for this Y data. It should have only one dimensions.")
+
+
+    def partial_fit(self, X_data, aux_data, aux_mask, Y_data, show_loss=False):
+        self.validate_input_X(X_data)
+        self.validate_input_X(aux_data)
+        self.validate_input_Y(Y_data)
+
+        optimizer = optim.SGD(self.parameters(), lr=self.n)
+        optimizer.zero_grad()
+        y_pred = self.forward(X_data, aux_data, aux_mask)
+        self.prediction.append(y_pred)
+        loss = self.loss_fn(y_pred, torch.tensor(Y_data))
+        self.loss_array.append(loss.item())
+        loss.backward()
+        optimizer.step()
+
+        if show_loss:
+            print("Loss is: ", loss)
+                
+                
