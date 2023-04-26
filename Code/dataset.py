@@ -3,7 +3,7 @@ import random
 import numpy as np
 import torch
 import os
-
+import pickle
 
 # features_size - Number of base features
 # max_num_hidden_layers - Number of hidden layers
@@ -21,22 +21,8 @@ import os
 
 
 
-def dataset(name = "german"):
-    # Values to change
-    n = 0.1
-    aux_feat_prob = 0.25
-    dropout_p = 0.3
-    max_num_hidden_layers = 6
-    qtd_neuron_per_hidden_layer = 50
-    n_classes = 2
-    aux_layer = 1
-    n_neuron_aux_layer = 400
-    batch_size = 1
-    b = 0.99
-    s = 0.2
-    use_cuda = False
-    seed = 2022 # Change this value for each experiment
-
+def dataset(name = "german", type = "variable_p", aux_feat_prob = 0.5, use_cuda = False, seed = 2022):
+    
     # Initializing seed for reproducibility
     random.seed(seed)
     np.random.seed(seed)
@@ -48,6 +34,7 @@ def dataset(name = "german"):
         data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'german.data-numeric')
         n_feat = 24
         n_aux_feat = 22
+        n_base_feat = n_feat - n_aux_feat
         number_of_instances = 1000
 
         # reading csv files
@@ -61,7 +48,21 @@ def dataset(name = "german"):
                 data.iloc[i,3] = int(data.iloc[i,3].split(" ")[1])
 
         # Masking
-        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        if type == "trapezoidal":
+                num_chunks = 10
+                chunk_size = int(number_of_instances/10)
+                aux_mask = np.zeros((number_of_instances, n_aux_feat))
+                aux_feat_chunk_list = [round((n_feat/num_chunks)*i) - n_base_feat for i in range(1, num_chunks+1)]
+                if aux_feat_chunk_list[0] == -1:
+                        aux_feat_chunk_list[0] = 0
+                aux_feat_chunk_list
+                for i in range(num_chunks):
+                        aux_mask[chunk_size*i:chunk_size*(i+1), :aux_feat_chunk_list[i]] = 1
+        elif type == "variable_p":
+                aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        else:
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
 
         # Data division
         n_base_feat = data.shape[1] - 1 - n_aux_feat
@@ -70,9 +71,7 @@ def dataset(name = "german"):
         X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
         X_aux_new = np.where(aux_mask, X_aux, 0)
 
-        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
-                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
-                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+        return n_base_feat, n_aux_feat,  X_base, X_aux, X_aux_new, aux_mask, Y, label
     
     if name == "svmguide3":
         # Data description
@@ -80,6 +79,7 @@ def dataset(name = "german"):
         data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'svmguide3.txt')
         n_feat = 21
         n_aux_feat = 19
+        n_base_feat = n_feat - n_aux_feat
         number_of_instances = 1243
 
         # reading csv files
@@ -95,7 +95,21 @@ def dataset(name = "german"):
         label = np.asarray(data[0])
 
         # Masking
-        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        if type == "trapezoidal":
+                num_chunks = 10
+                chunk_size = int(number_of_instances/10)
+                aux_mask = np.zeros((number_of_instances, n_aux_feat))
+                aux_feat_chunk_list = [round((n_feat/num_chunks)*i) - n_base_feat for i in range(1, num_chunks+1)]
+                if aux_feat_chunk_list[0] == -1:
+                        aux_feat_chunk_list[0] = 0
+                aux_feat_chunk_list
+                for i in range(num_chunks):
+                        aux_mask[chunk_size*i:chunk_size*(i+1), :aux_feat_chunk_list[i]] = 1
+        elif type == "variable_p":
+                aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        else:
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
 
         # Data division
         n_base_feat = data.shape[1] - 1 - n_aux_feat
@@ -104,9 +118,7 @@ def dataset(name = "german"):
         X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
         X_aux_new = np.where(aux_mask, X_aux, 0)
         
-        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
-                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
-                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+        return n_base_feat, n_aux_feat,  X_base, X_aux, X_aux_new, aux_mask, Y, label
     
     if name == "magic04":
         # Data description
@@ -114,6 +126,7 @@ def dataset(name = "german"):
         data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'magic04.data')
         n_feat = 10
         n_aux_feat = 8
+        n_base_feat = n_feat - n_aux_feat
         number_of_instances = 19020
 
         # reading csv files
@@ -125,7 +138,21 @@ def dataset(name = "german"):
 
 
         # Masking
-        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        if type == "trapezoidal":
+                num_chunks = 10
+                chunk_size = int(number_of_instances/10)
+                aux_mask = np.zeros((number_of_instances, n_aux_feat))
+                aux_feat_chunk_list = [round((n_feat/num_chunks)*i) - n_base_feat for i in range(1, num_chunks+1)]
+                if aux_feat_chunk_list[0] == -1:
+                        aux_feat_chunk_list[0] = 0
+                aux_feat_chunk_list
+                for i in range(num_chunks):
+                        aux_mask[chunk_size*i:chunk_size*(i+1), :aux_feat_chunk_list[i]] = 1
+        elif type == "variable_p":
+                aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        else:
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
 
         # Data division
         n_base_feat = data.shape[1] - 1 - n_aux_feat
@@ -134,9 +161,7 @@ def dataset(name = "german"):
         X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
         X_aux_new = np.where(aux_mask, X_aux, 0)
 
-        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
-                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
-                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+        return n_base_feat, n_aux_feat,  X_base, X_aux, X_aux_new, aux_mask, Y, label
 
     if name == "a8a":
         # Data description
@@ -144,6 +169,7 @@ def dataset(name = "german"):
         data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'a8a.txt')
         n_feat = 123
         n_aux_feat = 121
+        n_base_feat = n_feat - n_aux_feat
         number_of_instances = 32561
 
         data = pd.DataFrame(0, index=range(number_of_instances), columns = list(range(1, n_feat+1)))
@@ -159,7 +185,21 @@ def dataset(name = "german"):
         label = np.array(data["class"])
 
         # Masking
-        aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        if type == "trapezoidal":
+                num_chunks = 10
+                chunk_size = int(number_of_instances/10)
+                aux_mask = np.zeros((number_of_instances, n_aux_feat))
+                aux_feat_chunk_list = [round((n_feat/num_chunks)*i) - n_base_feat for i in range(1, num_chunks+1)]
+                if aux_feat_chunk_list[0] == -1:
+                        aux_feat_chunk_list[0] = 0
+                aux_feat_chunk_list
+                for i in range(num_chunks):
+                        aux_mask[chunk_size*i:chunk_size*(i+1), :aux_feat_chunk_list[i]] = 1
+        elif type == "variable_p":
+               aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        else:
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
 
         # Data division
         n_base_feat = data.shape[1] - 1 - n_aux_feat
@@ -168,9 +208,119 @@ def dataset(name = "german"):
         X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
         X_aux_new = np.where(aux_mask, X_aux, 0)
 
-        return n_base_feat, max_num_hidden_layers, qtd_neuron_per_hidden_layer, \
-                n_classes, aux_layer, n_neuron_aux_layer, batch_size, b,  n, s, \
-                dropout_p, n_aux_feat,  use_cuda, X_base, X_aux_new, aux_mask, Y, label
+        return n_base_feat, n_aux_feat,  X_base, X_aux, X_aux_new, aux_mask, Y, label
 
-    else:
-        print("The data name entered is wrong. Please type one of the following names: german, svmguide3, magic04, a8a")
+    if name == "ItalyPowerDemand":
+        # Data description
+        # Path to data
+        data_path_train = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'ItalyPowerDemand_TRAIN.txt')
+        data_path_test = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'ItalyPowerDemand_TEST.txt')
+        n_feat = 24
+        n_aux_feat = 12
+        n_base_feat = n_feat - n_aux_feat
+        number_of_instances = 1096
+
+        # Load Data
+        data_train = pd.read_csv(data_path_train, sep = "  ", header = None, engine = 'python')
+        data_test = pd.read_csv(data_path_test, sep = "  ", header = None, engine = 'python')
+        data = pd.concat([data_train, data_test])
+        label = np.array(data[0] == 1.0)*1
+        
+        # Masking
+        if type == "trapezoidal":
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
+        elif type == "variable_p":
+               aux_mask = (np.random.random((number_of_instances, n_aux_feat)) < aux_feat_prob).astype(float)
+        else:
+                print("Please choose the type as \"variable_p\" for ", name, " dataset")
+                exit()
+
+        # Data division
+        n_base_feat = data.shape[1] - 1 - n_aux_feat
+        Y = np.array(data.iloc[:,:1]) - 1
+        X_base = np.array(data.iloc[:,1:n_base_feat+1], dtype = float)
+        X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
+        X_aux_new = np.where(aux_mask, X_aux, 0)
+
+        return n_base_feat, n_aux_feat,  X_base, X_aux, X_aux_new, aux_mask, Y, label
+    
+    if name == "SUSY":
+        # Data description
+        # Path to data
+        data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'data', 'SUSY_1M.csv.gz')
+        n_feat = 8
+        n_aux_feat = 6
+        n_base_feat = n_feat - n_aux_feat
+        number_of_instances = 1000000 # 1M
+        number_of_instances_name = "1M"
+        Start = "100k"
+        Gap = "100k"
+        Stream = "400k"
+
+        # Load Data
+        data = pd.read_csv(data_path, compression='gzip', nrows=number_of_instances)
+        label = np.array(data["0"] == 1.0)*1
+
+        # Masking
+        if type == "variable_p":
+                mask_file_name = name + "_" + number_of_instances_name +"_P_" + str(int(aux_feat_prob*100)) + "_AuxFeat_" + str(n_aux_feat) + ".data"
+                mask_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'mask', mask_file_name)
+                with open(mask_path, 'rb') as file:
+                        aux_mask = pickle.load(file)
+        elif type == "obsolete_sudden":
+                mask_file_name = name + "_" + number_of_instances_name + "_Start" + Start + "_Gap" + Gap + "_Stream" + Stream + "_AuxFeat_" + str(n_aux_feat) + ".data"
+                mask_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'mask', mask_file_name)
+                with open(mask_path, 'rb') as file:
+                        aux_mask = pickle.load(file)
+        else:
+                print("Please choose the type as \"variable_p\" or \"obsolete_sudden\" for ", name, " dataset")
+                exit()
+
+        # Data division
+        Y = np.array(data.iloc[:,:1])
+        X_base = np.array(data.iloc[:,1:n_base_feat+1], dtype = float)
+        X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
+        X_aux_new = np.where(aux_mask[:number_of_instances], X_aux, 0)
+
+        return n_base_feat, n_aux_feat, X_base, X_aux, X_aux_new, aux_mask, Y, label
+    
+    if name == "HIGGS":
+        # Data description
+        # Path to data
+        data_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'data', 'HIGGS_1M.csv.gz')
+        n_feat = 21
+        n_aux_feat = 16
+        n_base_feat = n_feat - n_aux_feat
+        number_of_instances = 1000000 # 1M
+        number_of_instances_name = "1M"
+        Start = "50k"
+        Gap = "50k"
+        Stream = "200k"
+
+        # Load Data
+        data = pd.read_csv(data_path, compression='gzip', nrows=number_of_instances)
+        label = np.array(data["0"] == 1.0)*1
+
+        # Masking
+        if type == "variable_p":
+                mask_file_name = name + "_" + number_of_instances_name +"_P_" + str(int(aux_feat_prob*100)) + "_AuxFeat_" + str(n_aux_feat) + ".data"
+                mask_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'mask', mask_file_name)
+                with open(mask_path, 'rb') as file:
+                        aux_mask = pickle.load(file)
+        elif type == "obsolete_sudden":
+                mask_file_name = name + "_" + number_of_instances_name + "_Start" + Start + "_Gap" + Gap + "_Stream" + Stream + "_AuxFeat_" + str(n_aux_feat) + ".data"
+                mask_path = os.path.join(os.path.dirname(__file__), 'Datasets', name, 'mask', mask_file_name)
+                with open(mask_path, 'rb') as file:
+                        aux_mask = pickle.load(file)
+        else:
+                print("Please choose the type as \"variable_p\" or \"obsolete_sudden\" for ", name, " dataset")
+                exit()
+
+        # Data division
+        Y = np.array(data.iloc[:,:1])
+        X_base = np.array(data.iloc[:,1:n_base_feat+1], dtype = float)
+        X_aux = np.array(data.iloc[:,n_base_feat+1:], dtype = float)
+        X_aux_new = np.where(aux_mask[:number_of_instances], X_aux, 0)
+
+        return n_base_feat, n_aux_feat, X_base, X_aux, X_aux_new, aux_mask, Y, label
