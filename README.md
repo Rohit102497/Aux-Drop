@@ -71,4 +71,18 @@ We implement the ODL code and run it on for two scenarios.
 
 ## Control Parameters
 
+1. `data_name`: "german", "svmguide3", "magic04", "a8a", "ItalyPowerDemand", "SUSY", "HIGGS"
+2. `type`: "variable_p", "trapezoidal", "obsolete_sudden"
+3. `model_to_run`: "AuxDrop_ODL", "AuxDrop_OGD", "AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer", "AuxDrop_ODL_RandomAllLayer", "AuxDrop_ODL_RandomInAuxLayer", "AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst"
+4. `n`: Learning rate
+5. `aux_feat_prob`: If `type = "variable_p"`, then `aux_feat_prob` needs to be defined. It is the availability of each auxiliary input feature independently by a uniform distribution of probability `aux_feat_prob`
+6. `dropout_p`: The dropout value of AuxLayer
+7. `max_num_hidden_layers`: Number of hidden layers
+8. `qtd_neuron_per_hidden_layer`: Number of neurons in each hidden layers except the AuxLayer
+9. `n_classes`: The number of output classes
+10. `aux_layer`: The position of the AuxLayer in the architecture
+11. `n_neuron_aux_layer`: Number of neurons in the AuxLayer
+12. `b`: This is a parameter of ODL framework. It represents the discount rate.
+13. `s`: This is a parameter of ODL framework. It represents the smoothing rate
+
 ## Running the code
