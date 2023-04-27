@@ -1,5 +1,6 @@
 
 # Aux-Drop: Handling Haphazard Inputs in Online Learning Using Auxiliary Dropouts
+This repository is a work in progress.
 
 ## Overview
 This repository contains datasets and implementation code for the paper, titled "Aux-Drop: Handling Haphazard Inputs in Online Learning Using Auxiliary Dropouts".
@@ -34,6 +35,7 @@ https://www.cs.ucr.edu/~eamonn/time_series_data_2018/
  - Data: The preprocessed datasets can be found in - https://figshare.com/s/f4098ce6635f702c89b2. Save this dataset in the `Code/Datasets/SUSY/data/` folder.
  - Mask: The masking for all the experiments with the HIGGS data can be found here - https://figshare.com/s/87330bbbbc31b15d44e5. Save all the file from the link to the `Code/Datasets/SUSY/mask/` folder.
 
+
 ## Dataset Preparation
 ### Variable P
 We varied the availability of each auxiliary input feature independently by a uniform distribution of probability $p$, i.e., each auxilairy feature is available for $100p\%$. For more information about this, follow paper - Aux-Net (https://link.springer.com/chapter/10.1007/978-3-031-30105-6_46)
@@ -47,7 +49,7 @@ We demonstrate the effectiveness of Aux-Drop(ODL) in processing the extra inform
 ## Comparison Models
 We apply the Aux-Drop on two base architectures, ODL and OGD (https://arxiv.org/abs/1711.03705). Moreover, we also see the preformance of the Aux-Drop with few of its variants (changes in the design).
 
-### Base Model
+### ODL and OGD
 1. Aux_Drop_ODL: Aux-Drop applied on the ODL architecture is called Aux_Drop_ODL in the code.
 2. Aux-Drop_OGD: Aux-Drop applied on the OGD architecture is called Aux_Drop_OGD in the code.
 
@@ -56,6 +58,7 @@ We apply the Aux-Drop on two base architectures, ODL and OGD (https://arxiv.org/
 2. AuxDrop_ODL_RandomAllLayer - On ODL framework, Random Dropout is applied in all the layers
 3. AuxDrop_ODL_RandomInAuxLayer - On ODL framework, Random Dropout is applied in the AuxLayer
 4. AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst - On ODL framework, Random Dropout is applied in the first layer and all the features (base + auxiliary) are passed to the first layer.
+
 
 ## Baseline
 ### Aux-Net
@@ -68,6 +71,20 @@ All the metrics are directly taken from the paper (https://ieeexplore.ieee.org/d
 We implement the ODL code and run it on for two scenarios. 
 1. Only Base Feature - First, we run it using all the base features. This gives us a lower limit of the performance.
 2. All Features - Then we run it using all the features (considering all the featues are avaialable). This gives us an upper limit of the performance.
+
+## Files
+To run the models, see
+1. main.py: All the comparison models can be run from this.
+2. baseline.py: To run the Baseline model (ODL)
+
+The class definition for each comparison model is given in
+1. AuxDrop.py
+
+The class definition for ODL baseline is given in
+1. ODL.py
+
+The dataloader for each dataset is given in
+1. dataset.py
 
 ## Control Parameters
 
@@ -82,7 +99,9 @@ We implement the ODL code and run it on for two scenarios.
 9. `n_classes`: The number of output classes
 10. `aux_layer`: The position of the AuxLayer in the architecture
 11. `n_neuron_aux_layer`: Number of neurons in the AuxLayer
-12. `b`: This is a parameter of ODL framework. It represents the discount rate.
+12. `b`: This is a parameter of ODL framework. It represents the discount rate
 13. `s`: This is a parameter of ODL framework. It represents the smoothing rate
 
 ## Running the code
+
+
