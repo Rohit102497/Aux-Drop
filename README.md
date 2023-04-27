@@ -78,16 +78,17 @@ To run the models, see
 2. baseline.py: To run the Baseline model (ODL)
 
 The class definition for each comparison model is given in
-1. AuxDrop.py
+ - AuxDrop.py
 
 The class definition for ODL baseline is given in
-1. ODL.py
+ - ODL.py
 
 The dataloader for each dataset is given in
-1. dataset.py
+ - dataset.py
 
 ## Control Parameters
 
+For **main.py** file, 
 1. `data_name`: "german", "svmguide3", "magic04", "a8a", "ItalyPowerDemand", "SUSY", "HIGGS"
 2. `type`: "variable_p", "trapezoidal", "obsolete_sudden"
 3. `model_to_run`: "AuxDrop_ODL", "AuxDrop_OGD", "AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer", "AuxDrop_ODL_RandomAllLayer", "AuxDrop_ODL_RandomInAuxLayer", "AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst"
@@ -101,6 +102,17 @@ The dataloader for each dataset is given in
 11. `n_neuron_aux_layer`: Number of neurons in the AuxLayer
 12. `b`: This is a parameter of ODL framework. It represents the discount rate
 13. `s`: This is a parameter of ODL framework. It represents the smoothing rate
+
+For **baseline.py** file,
+1. `data_name`: "SUSY", "HIGGS"
+2. `model_to_run`: "ODL"
+3. `data_type`: "only_base", "all_feat"
+4. `n`: Learning rate
+5. `max_num_hidden_layers`: Number of hidden layers
+6. `qtd_neuron_per_hidden_layer`: Number of neurons in each hidden layers
+7. `n_classes`: The number of output classes
+8. `b`: It represents the discount rate
+9. `s`: It represents the smoothing rate
 
 ## Running the code
 
