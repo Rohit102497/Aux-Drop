@@ -52,19 +52,22 @@ We apply the Aux-Drop on two base architectures, ODL and OGD (https://arxiv.org/
 2. Aux-Drop_OGD: Aux-Drop applied on the OGD architecture is called Aux_Drop_OGD in the code.
 
 ### Variants
-1. AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer -  On ODL framework, Aux-Dropout in AuxLayer and Random dropout in all the other layers
-2. AuxDrop_ODL_RandomAllLayer - On ODL framework, Random Dropout applied in all the layers
-3. AuxDrop_ODL_RandomInAuxLayer - On ODL framework, Random Dropout applied in the AuxLayer
-4. AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst - On ODL framework, Random Dropout applied in the first layer and all the features (base + auxiliary) are passed to the first layer
+1. AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer -  On ODL framework, Aux-Dropout is applied in AuxLayer and Random dropout in all the other layers
+2. AuxDrop_ODL_RandomAllLayer - On ODL framework, Random Dropout is applied in all the layers
+3. AuxDrop_ODL_RandomInAuxLayer - On ODL framework, Random Dropout is applied in the AuxLayer
+4. AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst - On ODL framework, Random Dropout is applied in the first layer and all the features (base + auxiliary) are passed to the first layer.
 
 ## Baseline
 ### Aux-Net
 All the metrics are directly taken from the paper (https://link.springer.com/chapter/10.1007/978-3-031-30105-6_46) hence we do not implement here.
-### OLVF
-### OCDS 
+### OLVF 
+All the metrics are directly taken from the paper (https://ojs.aaai.org/index.php/AAAI/article/view/4192) hence we do not implement here. 
+### OLSF
+All the metrics are directly taken from the paper (https://ieeexplore.ieee.org/document/7465766) hence we do not implement here. 
 ### ODL
-1. Only Base Feature
-2. All Features
+We implement the ODL code and run it on for two scenarios. 
+1. Only Base Feature - First, we run it using all the base features. This gives us a lower limit of the performance.
+2. All Features - Then we run it using all the features (considering all the featues are avaialable). This gives us an upper limit of the performance.
 
 ## Control Parameters
 
