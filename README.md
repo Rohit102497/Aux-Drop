@@ -36,6 +36,8 @@ https://www.cs.ucr.edu/~eamonn/time_series_data_2018/
 
 ## Dataset Preparation
 ### Variable P
+We varied the availability of each auxiliary input feature independently by a uniform distribution of probability $p$, i.e., if each auxilairy feature is available for 100$p$% 
+
 ### Trapezoidal
 ### Obsolete Sudden
 
