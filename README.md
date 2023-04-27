@@ -114,12 +114,21 @@ For **baseline.py** file,
 8. `b`: It represents the discount rate
 9. `s`: It represents the smoothing rate
 
+## Dependencies
+1. numpy
+2. torch
+3. pandas
+4. random
+5. tqdm
+6. os
+7. pickle
+
 ## Running the code
 
 To run the Aux-Drop model, change the control parameters accordingly in the **main.py** file and run
-`python Code/main.py`
+ - `python Code/main.py`
 
 To run the baseline ODL model, change the control parameters accordingly in the **baseline.py** file and run
-`python Code/baseline.py`
+ - `python Code/baseline.py`
 
 
