@@ -116,4 +116,10 @@ For **baseline.py** file,
 
 ## Running the code
 
+To run the Aux-Drop model, change the control parameters accordingly in the **main.py** file and run
+`python Code/main.py`
+
+To run the baseline ODL model, change the control parameters accordingly in the **baseline.py** file and run
+`python Code/baseline.py`
+
 
