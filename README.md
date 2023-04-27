@@ -44,13 +44,18 @@ The trapezoidal streams are simulated by splitting the data into 10 chunks. The 
 ### Obsolete Sudden
 We demonstrate the effectiveness of Aux-Drop(ODL) in processing the extra information received from auxiliary features in both the SUSY and HIGGS datasets. Here, we design the data in a such way that all of them are sudden features, i.e., there is no information about the existence of these features when the model is defined. The model knows about this feature suddenly at time $t$ after the model deployment. For the SUSY dataset, the first auxiliary feature starts arriving from 100k till 500k, the next auxiliary feature ranges from 200k till 600k, and so on to the 6th auxiliary feature coming from 600k to 1000k instances. Each feature becomes obsolete after arriving for 400k instances. Similarly for the HIGGS dataset, the first auxiliary feature arrives from 50k to 250k instances, the second arrives from 100k to 300k, and so on where every successive auxiliary feature arrives at 50k instances after the previous auxiliary features start arriving and arrive till the next 200k instances.
 
-## Variants
-1. Aux_Drop_ODL:
-2. Aux-Drop_OGD:
-3. AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer -  On ODL framework, Aux-Dropout in AuxLayer and Random dropout in all the other layers
-4. AuxDrop_ODL_RandomAllLayer - On ODL framework, Random Dropout applied in all the layers
-5. AuxDrop_ODL_RandomInAuxLayer - On ODL framework, Random Dropout applied in the AuxLayer
-6. AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst - On ODL framework, Random Dropout applied in the first layer and all the features (base + auxiliary) are passed to the first layer
+## Comparison Models
+We apply the Aux-Drop on two base architectures, ODL and OGD (https://arxiv.org/abs/1711.03705). Moreover, we also see the preformance of the Aux-Drop with few of its variants (changes in the design).
+
+### Base Model
+1. Aux_Drop_ODL: Aux-Drop applied on the ODL architecture is called Aux_Drop_ODL in the code.
+2. Aux-Drop_OGD: Aux-Drop applied on the OGD architecture is called Aux_Drop_OGD in the code.
+
+### Variants
+1. AuxDrop_ODL_DirectedInAuxLayer_RandomOtherLayer -  On ODL framework, Aux-Dropout in AuxLayer and Random dropout in all the other layers
+2. AuxDrop_ODL_RandomAllLayer - On ODL framework, Random Dropout applied in all the layers
+3. AuxDrop_ODL_RandomInAuxLayer - On ODL framework, Random Dropout applied in the AuxLayer
+4. AuxDrop_ODL_RandomInFirstLayer_AllFeatToFirst - On ODL framework, Random Dropout applied in the first layer and all the features (base + auxiliary) are passed to the first layer
 
 ## Baseline
 ### Aux-Net
