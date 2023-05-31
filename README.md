@@ -2,7 +2,7 @@
 # Aux-Drop: Handling Haphazard Inputs in Online Learning Using Auxiliary Dropouts
 This paper is accepted at Transactions on Machine Learning Research. The link to the paper is: https://openreview.net/pdf?id=R9CgBkeZ6Z. 
 
-Please cite this paper, in case you are using the code or the paper:\
+Please cite this paper, in case you are using the code or the paper:  
 `@article{\
 agarwal2023auxdrop,\
 title={Aux-Drop: Handling Haphazard Inputs in Online Learning Using Auxiliary Dropouts},\
