@@ -3,7 +3,7 @@
 This paper is accepted at Transactions on Machine Learning Research. The link to the paper is: https://openreview.net/pdf?id=R9CgBkeZ6Z. 
 
 Please cite this paper, in case you are using the code or the paper:  
-`@article{\
+`@article{<br /> 
 agarwal2023auxdrop,\
 title={Aux-Drop: Handling Haphazard Inputs in Online Learning Using Auxiliary Dropouts},\
 author={Rohit Agarwal and Deepak Gupta and Alexander Horsch and Dilip K. Prasad},\
